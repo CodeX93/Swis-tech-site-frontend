@@ -116,8 +116,8 @@ const AddRecordModal = ({ open, handleClose, length }) => {
         srNo: length + 1,
       };
 
-      console.log(formData);
-      console.log(apiData);
+      
+      
       const response = await fetch(`${BaseUrl}/api/pending-records/`, {
         method: 'POST',
         headers: {
@@ -131,7 +131,7 @@ const AddRecordModal = ({ open, handleClose, length }) => {
       }
 
       const result = await response.json();
-      console.log('Record added:', result);
+      console.log('Record added');
 
       // Display success feedback
       setFeedback({ open: true, message: 'Record added successfully!', severity: 'success' });

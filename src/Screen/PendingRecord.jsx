@@ -59,6 +59,7 @@ const PendingWorks = () => {
 
   const handleOpenEditModal = (item) => {
     setSelectedItem(item);
+    
     setEditModalOpen(true);
     
   };
@@ -81,7 +82,7 @@ const PendingWorks = () => {
   };
 
   const handleSave = (updatedItem) => {
-    console.log('Updated item:', updatedItem);
+    console.log('Updated item');
     // Implement save logic here, e.g., updating the item in state or backend
   };
 

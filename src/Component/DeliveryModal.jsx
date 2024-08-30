@@ -60,8 +60,7 @@ const DeliveryModal = ({ open, handleClose, handleConfirm, item ,length}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(item)
-    console.log(formData)
+   
     
     try {
       

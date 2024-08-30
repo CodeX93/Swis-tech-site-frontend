@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal, Box, Typography, TextField, Button, IconButton, Grid
 } from '@mui/material';
@@ -8,21 +8,24 @@ import BaseUrl from '../Asset/BaseUrl';
 const EditRecordModal = ({ open, handleClose, item, onSaveSuccess }) => {
   const today = new Date().toISOString().split('T')[0]; // Default date to today
 
+  useEffect(() => {
+  }, [item]);
+
   const [formData, setFormData] = useState({
     clientName: item.clientName || '',
     clientContactNo: item.clientContactNo || '',
     coName: item.coName || '',
     coPhone: item.coPhone || '',
     plotNo: item.plotNo || '',
-    plotSize: item.plotSize || '', // New field for plot size
+    plotSize: item.plotSize || '',
     streetNo: item.streetNo || '',
     sector: item.sector || '',
     scheme: item.scheme || '',
-    paidOn: item.paidOn || today,
-    fee: item.fee || 25000,
-    proposedDate: item.fwDoneOn || today,
-    fwDoneOn: item.fwDoneOn || '',
-    proposedReportDate: item.proposedReportDate || today,
+    fee: item.fee || '',
+    paidOn: item.paidOn ? new Date(item.paidOn).toISOString().split('T')[0] : today,
+    proposedDate: item.proposedDate ? new Date(item.proposedDate).toISOString().split('T')[0] : today,
+    fwDoneOn: item.fwDoneOn ? new Date(item.fwDoneOn).toISOString().split('T')[0] : today,
+    proposedReportDate: item.proposedReportDate ? new Date(item.proposedReportDate).toISOString().split('T')[0] : today,
   });
 
   const handleChange = (e) => {
@@ -46,7 +49,6 @@ const EditRecordModal = ({ open, handleClose, item, onSaveSuccess }) => {
   };
 
   const handleSave = async (id, updatedData) => {
-    
     const response = await fetch(`${BaseUrl}/api/pending-records/${id}`, {
       method: 'PATCH',
       headers: {
@@ -269,7 +271,7 @@ const EditRecordModal = ({ open, handleClose, item, onSaveSuccess }) => {
                   margin="normal"
                   variant="outlined"
                   InputLabelProps={{ shrink: true }}
-                  value={formData.paidOn || today} // Default to today if not set
+                  value={formData.paidOn}
                   onChange={handleChange}
                 />
               </Grid>
@@ -284,53 +286,51 @@ const EditRecordModal = ({ open, handleClose, item, onSaveSuccess }) => {
                   InputLabelProps={{ shrink: true }}
                   value={formData.proposedDate}
                   onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="FW Done On"
-                  name="fwDoneOn"
-                  type="date"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  value={formData.fwDoneOn}
-                  onChange={handleFwDoneOnChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Proposed Report Date"
-                  name="proposedReportDate"
-                  type="date"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  value={formData.proposedReportDate}
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-            </Grid>
+                  />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="FW Done On"
+                      name="fwDoneOn"
+                      type="date"
+                      fullWidth
+                      margin="normal"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      value={formData.fwDoneOn}
+                      onChange={handleFwDoneOnChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Proposed Report Date"
+                      name="proposedReportDate"
+                      type="date"
+                      fullWidth
+                      margin="normal"
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
+                      value={formData.proposedReportDate}
+                      onChange={handleChange}
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+    
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+              >
+                Save Changes
+              </Button>
+            </form>
           </Box>
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-          >
-            Save Changes
-          </Button>
-        </form>
-      </Box>
-    </Modal>
-  );
-};
-
-export default EditRecordModal;
+        </Modal>
+      );
+    };
+    
+    export default EditRecordModal;
+    
