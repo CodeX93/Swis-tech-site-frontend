@@ -16,7 +16,7 @@ const UpcomingReportDeliveryDeadline = () => {
           throw new Error('Network response was not ok');
         }
         const result = await response.json();
-        console.log('Fetched data:', result);
+        console.log('Fetched data');
         setData(result);
       } catch (err) {
         setError('Error fetching data');

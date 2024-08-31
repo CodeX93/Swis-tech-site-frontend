@@ -12,11 +12,9 @@ import DeliveryModal from '../Component/DeliveryModal'; // Import the DeliveryMo
 import { format } from 'date-fns';
 import BaseUrl from '../Asset/BaseUrl';
 
-
-
 const formatDate = (date) => {
   if (date === null) {
-    return 'No date'; // Return a default value or empty string if date is null
+    return 'No date';
   }
   
   if (typeof date === 'string') {
@@ -24,22 +22,19 @@ const formatDate = (date) => {
   }
   
   if (!(date instanceof Date) || isNaN(date.getTime())) {
-    return 'Invalid date'; // Or any default value you prefer
+    return 'Invalid date';
   }
   
-  return format(date, 'dd-MM-yy'); // Format date as dd-MM-yy
+  return format(date, 'dd-MM-yy');
 };
-
-
 
 const PendingWorks = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState({}); // Initialize with an empty object
-  const [deliveryModalOpen, setDeliveryModalOpen] = useState(false); // New state for DeliveryModal
-  const [data, setData] = useState([]); // State to store fetched data
+  const [selectedItem, setSelectedItem] = useState({});
+  const [deliveryModalOpen, setDeliveryModalOpen] = useState(false);
+  const [data, setData] = useState([]);
 
-  // Fetch data from the API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -52,38 +47,49 @@ const PendingWorks = () => {
     };
 
     fetchData();
-  }, [data]); // Empty dependency array means this useEffect runs once when the component mounts
+  }, [data]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.shiftKey && event.key === 'A') {
+        setModalOpen(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => setModalOpen(false);
 
   const handleOpenEditModal = (item) => {
     setSelectedItem(item);
-    
     setEditModalOpen(true);
-    
   };
 
   const handleCloseEditModal = () => {
     setEditModalOpen(false);
-    setSelectedItem({}); // Clear selected item
+    setSelectedItem({});
   };
 
   const handleOpenDeliveryModal = (item) => {
-    setSelectedItem(item); // Set the selected item
-    setDeliveryModalOpen(true); // Open DeliveryModal
+    setSelectedItem(item);
+    setDeliveryModalOpen(true);
   };
   
-  const handleCloseDeliveryModal = () => setDeliveryModalOpen(false); // Close DeliveryModal
+  const handleCloseDeliveryModal = () => setDeliveryModalOpen(false);
+  
   const handleConfirmDelivery = () => {
     console.log('Delivery confirmed.');
-    handleCloseDeliveryModal(); // Close the modal after confirming
-    
+    handleCloseDeliveryModal();
   };
 
   const handleSave = (updatedItem) => {
     console.log('Updated item');
-    // Implement save logic here, e.g., updating the item in state or backend
   };
 
   const handleDeleteClick = async (id) => {
@@ -95,9 +101,6 @@ const PendingWorks = () => {
       if (response.ok) {
         alert('Record marked completed Successfully.')
         window.location.reload();
-        
-        
-        
       } else {
         console.error('Failed to delete record:', response.statusText);
       }
@@ -137,7 +140,6 @@ const PendingWorks = () => {
               </TableHead>
               <TableBody>
                 {data.map((item, index) => (
-                  
                   <TableRow key={item._id} sx={{ '&:nth-of-type(even)': { bgcolor: theme.palette.grey[50] } }}>
                     <TableCell sx={{ padding: '8px' }}>{index + 1}</TableCell>
                     <TableCell sx={{ padding: '8px' }}>
@@ -148,16 +150,14 @@ const PendingWorks = () => {
                     <TableCell sx={{ padding: '8px' }}>{item.coName}</TableCell>
                     <TableCell sx={{ padding: '8px' }}>{item.coPhoneNumber}</TableCell>
                     <TableCell sx={{ padding: '8px' }}>{formatDate(item.proposedDate)}</TableCell>
-
                     <TableCell sx={{ padding: '8px' }}>
-                    <IconButton color="primary" onClick={() => handleOpenDeliveryModal(item)}>
-  <FaCheckCircle />
-</IconButton>
-
+                      <IconButton color="primary" onClick={() => handleOpenDeliveryModal(item)}>
+                        <FaCheckCircle />
+                      </IconButton>
                       <IconButton color="primary" onClick={() => handleOpenEditModal(item)}>
                         <FaEdit />
                       </IconButton>
-                      <IconButton color="error" onClick={()=>handleDeleteClick(item._id)}>
+                      <IconButton color="error" onClick={() => handleDeleteClick(item._id)}>
                         <FaTrash />
                       </IconButton>
                     </TableCell>
@@ -167,7 +167,7 @@ const PendingWorks = () => {
             </Table>
           </TableContainer>
         </Box>
-        <AddRecordModal open={modalOpen} handleClose={handleCloseModal}  length={data.length}/>
+        <AddRecordModal open={modalOpen} handleClose={handleCloseModal} length={data.length} />
         {editModalOpen && selectedItem && (
           <EditRecordModal
             open={editModalOpen}
@@ -176,14 +176,13 @@ const PendingWorks = () => {
             handleSave={handleSave}
           />
         )}
-      {deliveryModalOpen && selectedItem && (
+        {deliveryModalOpen && selectedItem && (
           <DeliveryModal
             open={deliveryModalOpen}
             handleClose={handleCloseDeliveryModal}
             handleConfirm={handleConfirmDelivery}
-            item={selectedItem} // Pass the item to DeliveryModal
+            item={selectedItem}
             length={data.length}
-            
           />
         )}
       </>
