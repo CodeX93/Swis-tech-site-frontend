@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { format } from 'date-fns';
 import BaseUrl from "../Asset/BaseUrl"
+import theme from '../Theme';
 
 const UpcomingReportDeliveryDeadline = () => {
   const [data, setData] = useState([]);
@@ -53,10 +54,11 @@ const UpcomingReportDeliveryDeadline = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>SR No</TableCell>
-                <TableCell>Client Name</TableCell>
-                <TableCell>Day</TableCell>
-                <TableCell>Due Date</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>SR No</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Client Name</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Due Date</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Day</TableCell>
+                
               </TableRow>
             </TableHead>
             <TableBody>
@@ -64,8 +66,9 @@ const UpcomingReportDeliveryDeadline = () => {
                 <TableRow key={item.srNo}>
                   <TableCell>{item.srNo}</TableCell>
                   <TableCell>{item.clientName}</TableCell>
-                  <TableCell>{format(new Date(item.proposedReportDate), 'EEEE')}</TableCell>
                   <TableCell>{format(new Date(item.proposedReportDate), 'dd MMM yyyy')}</TableCell>
+                  <TableCell>{format(new Date(item.proposedReportDate), 'EEEE')}</TableCell>
+                  
                 </TableRow>
               ))}
             </TableBody>

@@ -27,6 +27,7 @@ const AddRecordModal = ({ open, handleClose, length }) => {
     paidOn: today,
     reportDelivery: '',
     srNo: '',
+    orderDate: today,  // Added OrderDate field
   });
 
   const [feedback, setFeedback] = useState({ open: false, message: '', severity: '' });
@@ -68,13 +69,12 @@ const AddRecordModal = ({ open, handleClose, length }) => {
   };
 
   const checkAvailability = async (date) => {
-    // Assuming the availability check endpoint returns a boolean
     const response = await fetch(`${BaseUrl}/api/pending-records/check`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ proposedDate: date }),
+      body: JSON.stringify({ fwDoneOn: date }),
     });
     
     if (!response.ok) {
@@ -87,14 +87,18 @@ const AddRecordModal = ({ open, handleClose, length }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const isAvailable = await checkAvailability(formData.proposedDate);
+      // Check availability for the proposed date
+      const isAvailable = await checkAvailability(formData.fwDoneOn);
+      console.log('Availability:', isAvailable); // Logging the result
+  
       if (!isAvailable) {
         setFeedback({ open: true, message: 'Proposed date is not available.', severity: 'error' });
         return;
       }
-
+  
+      // If available, proceed with form submission
       const apiData = {
         clientName: formData.clientName,
         clientContactNo: formData.clientContactNo,
@@ -114,10 +118,9 @@ const AddRecordModal = ({ open, handleClose, length }) => {
         paidOn: formData.paidOn,
         reportDelivery: formData.reportDelivery,
         srNo: length + 1,
+        orderDate: formData.orderDate, // Include OrderDate in the API request
       };
-
-      
-      
+  
       const response = await fetch(`${BaseUrl}/api/pending-records/`, {
         method: 'POST',
         headers: {
@@ -125,14 +128,14 @@ const AddRecordModal = ({ open, handleClose, length }) => {
         },
         body: JSON.stringify(apiData),
       });
-
+  
       if (!response.ok) {
         throw new Error('Failed to add record');
       }
-
+  
       const result = await response.json();
-      console.log('Record added');
-
+      console.log('Record added:', result);
+  
       // Display success feedback
       setFeedback({ open: true, message: 'Record added successfully!', severity: 'success' });
     } catch (error) {
@@ -140,9 +143,10 @@ const AddRecordModal = ({ open, handleClose, length }) => {
       // Display error feedback
       setFeedback({ open: true, message: 'Failed to add record.', severity: 'error' });
     }
-
+  
     handleClose(); // Close modal after submission
   };
+  
 
   return (
     <Modal
@@ -302,12 +306,26 @@ const AddRecordModal = ({ open, handleClose, length }) => {
             </Grid>
           </Box>
 
-          {/* Date Details Section */}
+          {/* Dates Section */}
           <Box mb={3}>
             <Typography variant="subtitle1" gutterBottom>
-              Date Details
+              Dates
             </Typography>
             <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Order Date"
+                  name="orderDate"
+                  type="date"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  value={formData.orderDate}
+                  onChange={handleChange}
+                  InputLabelProps={{ shrink: true }}
+                  required
+                />
+              </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Field Work Done On"
@@ -316,11 +334,13 @@ const AddRecordModal = ({ open, handleClose, length }) => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  InputLabelProps={{ shrink: true }}
                   value={formData.fwDoneOn}
                   onChange={handleFwDoneOnChange}
+                  required
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
+              
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Proposed Report Date"
@@ -329,67 +349,43 @@ const AddRecordModal = ({ open, handleClose, length }) => {
                   fullWidth
                   margin="normal"
                   variant="outlined"
-                  InputLabelProps={{ shrink: true }}
                   value={formData.proposedReportDate}
                   onChange={handleChange}
+                  InputLabelProps={{ shrink: true }}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Delivery Date"
+                  name="deliveryDate"
+                  type="date"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  value={formData.deliveryDate}
+                  onChange={handleChange}
+                  InputLabelProps={{ shrink: true }}
+                  required
                 />
               </Grid>
               
             </Grid>
           </Box>
 
-          {/* Payment Details Section */}
-          <Box mb={3}>
-            <Typography variant="subtitle1" gutterBottom>
-              Payment Details
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Fee"
-                  name="fee"
-                  type="number"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  value={formData.fee}
-                  onChange={handleChange}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Paid On"
-                  name="paidOn"
-                  type="date"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  value={formData.paidOn}
-                  onChange={handleChange}
-                />
-              </Grid>
-            </Grid>
-          </Box>
-
-          
-
-          <Box textAlign="right">
-            <Button type="submit" variant="contained" color="primary">
-              Add Record
-            </Button>
-          </Box>
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Add Record
+          </Button>
         </form>
 
         {/* Feedback Snackbar */}
         <Snackbar
           open={feedback.open}
           autoHideDuration={6000}
-          onClose={() => setFeedback((prev) => ({ ...prev, open: false }))}
+          onClose={() => setFeedback({ ...feedback, open: false })}
         >
           <Alert
-            onClose={() => setFeedback((prev) => ({ ...prev, open: false }))}
+            onClose={() => setFeedback({ ...feedback, open: false })}
             severity={feedback.severity}
             sx={{ width: '100%' }}
           >

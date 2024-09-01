@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { format } from 'date-fns';
 import BaseUrl from '../Asset/BaseUrl';
+import theme from '../Theme';
+
 
 const ThisWeekSchedule = () => {
   const [scheduleData, setScheduleData] = useState([]);
@@ -44,11 +46,12 @@ const ThisWeekSchedule = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>SR No</TableCell>
-              <TableCell>Client Name</TableCell>
-              <TableCell>Project</TableCell>
-              <TableCell>Day</TableCell>
-              <TableCell>Due Date</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>SR No</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Client Name</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Project</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Due Date</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Day</TableCell>
+              
             </TableRow>
           </TableHead>
           <TableBody>
@@ -59,8 +62,9 @@ const ThisWeekSchedule = () => {
                 <TableCell>
                   {item.plotNo || 'N/A'}, {item.streetNo || 'N/A'}, {item.sector || 'N/A'}, {item.scheme || 'N/A'}
                 </TableCell>
-                <TableCell>{format(new Date(item.proposedDate), 'EEEE')}</TableCell>
                 <TableCell>{format(new Date(item.proposedDate), 'dd MMM yyyy')}</TableCell>
+                <TableCell>{format(new Date(item.proposedDate), 'EEEE')}</TableCell>
+                
               </TableRow>
             ))}
           </TableBody>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Box, Button, Typography
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Box, Button, Typography, Tooltip
 } from '@mui/material';
 import { FaEdit, FaTrash, FaPlus, FaCheckCircle } from 'react-icons/fa';
 import { ThemeProvider } from '@mui/material/styles';
@@ -40,14 +40,22 @@ const PendingWorks = () => {
       try {
         const response = await fetch(`${BaseUrl}/api/pending-records/`);
         const result = await response.json();
-        setData(result);
+  
+        // Sort the result by orderDate
+        const sortedData = result.sort((a, b) => {
+          const dateA = new Date(a.orderDate);
+          const dateB = new Date(b.orderDate);
+          return dateA - dateB; // Earliest date first
+        });
+  
+        setData(sortedData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-
+  
     fetchData();
-  }, [data]);
+  }, []); // Note: Removed `data` from the dependency array to avoid infinite re-fetching
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -125,41 +133,49 @@ const PendingWorks = () => {
             Add New Work
           </Button>
           <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto', p: 2 }}>
-            <Table stickyHeader aria-label="sticky table">
+            <Table stickyHeader aria-label="pending works table">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '8px' }}>#</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '8px' }}>Description</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '8px' }}>Client</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '8px' }}>Client Contact</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '8px' }}>C/O Name</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '8px' }}>C/O Phone</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '8px' }}>FW Due Date</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '8px' }}>Actions</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>#</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Ord. Date</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Address</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Client</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Client Contact</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>C/O Name</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>C/O Phone</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>FW Due Date</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', bgcolor: theme.palette.grey[200], padding: '12px', textAlign: 'center' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {data.map((item, index) => (
-                  <TableRow key={item._id} sx={{ '&:nth-of-type(even)': { bgcolor: theme.palette.grey[50] } }}>
-                    <TableCell sx={{ padding: '8px' }}>{index + 1}</TableCell>
-                    <TableCell sx={{ padding: '8px' }}>
+                  <TableRow key={item._id} sx={{ '&:nth-of-type(even)': { bgcolor: theme.palette.grey[50] }, '&:hover': { bgcolor: theme.palette.grey[100] } }}>
+                    <TableCell sx={{ padding: '12px', textAlign: 'center' }}>{index + 1}</TableCell>
+                    <TableCell sx={{ padding: '12px', textAlign: 'center' }}>{formatDate(item.orderDate)}</TableCell>
+                    <TableCell sx={{ padding: '12px' }}>
                       Plot No: {item.plotNo}, Street No: {item.streetNo}, Sector/Block: {item.sector}, Scheme: {item.scheme}
                     </TableCell>
-                    <TableCell sx={{ padding: '8px' }}>{item.clientName}</TableCell>
-                    <TableCell sx={{ padding: '8px' }}>{item.clientContactNo}</TableCell>
-                    <TableCell sx={{ padding: '8px' }}>{item.coName}</TableCell>
-                    <TableCell sx={{ padding: '8px' }}>{item.coPhoneNumber}</TableCell>
-                    <TableCell sx={{ padding: '8px' }}>{formatDate(item.proposedDate)}</TableCell>
-                    <TableCell sx={{ padding: '8px' }}>
-                      <IconButton color="primary" onClick={() => handleOpenDeliveryModal(item)}>
-                        <FaCheckCircle />
-                      </IconButton>
-                      <IconButton color="primary" onClick={() => handleOpenEditModal(item)}>
-                        <FaEdit />
-                      </IconButton>
-                      <IconButton color="error" onClick={() => handleDeleteClick(item._id)}>
-                        <FaTrash />
-                      </IconButton>
+                    <TableCell sx={{ padding: '12px' }}>{item.clientName}</TableCell>
+                    <TableCell sx={{ padding: '12px' }}>{item.clientContactNo}</TableCell>
+                    <TableCell sx={{ padding: '12px' }}>{item.coName}</TableCell>
+                    <TableCell sx={{ padding: '12px' }}>{item.coPhoneNumber}</TableCell>
+                    <TableCell sx={{ padding: '12px' }}>{formatDate(item.proposedDate)}</TableCell>
+                    <TableCell sx={{ padding: '12px', textAlign: 'center' }}>
+                      <Tooltip title="Confirm Delivery" arrow>
+                        <IconButton color="primary" onClick={() => handleOpenDeliveryModal(item)}>
+                          <FaCheckCircle />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Edit Record" arrow>
+                        <IconButton color="primary" onClick={() => handleOpenEditModal(item)}>
+                          <FaEdit />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete Record" arrow>
+                        <IconButton color="error" onClick={() => handleDeleteClick(item._id)}>
+                          <FaTrash />
+                        </IconButton>
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))}

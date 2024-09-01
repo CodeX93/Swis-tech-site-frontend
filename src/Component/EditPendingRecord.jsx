@@ -26,6 +26,7 @@ const EditRecordModal = ({ open, handleClose, item, onSaveSuccess }) => {
     proposedDate: item.proposedDate ? new Date(item.proposedDate).toISOString().split('T')[0] : today,
     fwDoneOn: item.fwDoneOn ? new Date(item.fwDoneOn).toISOString().split('T')[0] : today,
     proposedReportDate: item.proposedReportDate ? new Date(item.proposedReportDate).toISOString().split('T')[0] : today,
+    orderDate: item.orderDate ? new Date(item.orderDate).toISOString().split('T')[0] : today, // New field
   });
 
   const handleChange = (e) => {
@@ -41,7 +42,6 @@ const EditRecordModal = ({ open, handleClose, item, onSaveSuccess }) => {
     
     try {
       await handleSave(item._id, formData); // Pass the ID and updated data to the save function
-      
       handleClose(); // Close modal after saving
     } catch (error) {
       console.error("Failed to save changes:", error);
@@ -248,7 +248,38 @@ const EditRecordModal = ({ open, handleClose, item, onSaveSuccess }) => {
             <Typography variant="subtitle1" gutterBottom>
               Fee and Dates
             </Typography>
-            <Grid container spacing={2}>
+            
+            <Grid item xs={12}>
+                <TextField
+                  label="Order Date"
+                  name="orderDate"
+                  type="date"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={formData.orderDate}
+                  onChange={handleChange}
+                  required
+                />
+              </Grid>
+         
+
+              <Grid item xs={12}>
+                <TextField
+                  label="FW Done On"
+                  name="fwDoneOn"
+                  type="date"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  value={formData.fwDoneOn}
+                  onChange={handleFwDoneOnChange}
+                />
+              </Grid>
+
+
               <Grid item xs={12}>
                 <TextField
                   label="Fee"
@@ -275,62 +306,35 @@ const EditRecordModal = ({ open, handleClose, item, onSaveSuccess }) => {
                   onChange={handleChange}
                 />
               </Grid>
+             
               <Grid item xs={12}>
                 <TextField
-                  label="Proposed Date"
-                  name="proposedDate"
+                  label="Proposed Report Date"
+                  name="proposedReportDate"
                   type="date"
                   fullWidth
                   margin="normal"
                   variant="outlined"
                   InputLabelProps={{ shrink: true }}
-                  value={formData.proposedDate}
+                  value={formData.proposedReportDate}
                   onChange={handleChange}
-                  />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="FW Done On"
-                      name="fwDoneOn"
-                      type="date"
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                      InputLabelProps={{ shrink: true }}
-                      value={formData.fwDoneOn}
-                      onChange={handleFwDoneOnChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Proposed Report Date"
-                      name="proposedReportDate"
-                      type="date"
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                      InputLabelProps={{ shrink: true }}
-                      value={formData.proposedReportDate}
-                      onChange={handleChange}
-                    />
-                  </Grid>
-                </Grid>
-              </Box>
-    
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-              >
-                Save Changes
-              </Button>
-            </form>
+                  readOnly // Read-only field as it's calculated based on FW Done On
+                />
+              </Grid>
+             
           </Box>
-        </Modal>
-      );
-    };
-    
-    export default EditRecordModal;
-    
+
+          {/* Save Button */}
+          <Box textAlign="center">
+            <Button variant="contained" color="primary" type="submit">
+              Save Changes
+            </Button>
+          </Box>
+        </form>
+      </Box>
+    </Modal>
+  );
+};
+
+export default EditRecordModal;
+
